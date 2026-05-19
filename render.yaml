@@ -2,14 +2,16 @@ databases:
   - name: atomberg-db
     databaseName: goalportal
     user: admin
+    plan: free
 
 services:
   # 1. Spring Boot Backend
   - type: web
     name: atomberg-backend
     env: docker
+    plan: free
     rootDir: backend
-    dockerfilePath: Dockerfile
+    dockerfilePath: ./Dockerfile
     envVars:
       - key: DB_HOST
         fromDatabase:
