@@ -1,0 +1,53 @@
+databases:
+  - name: atomberg-db
+    databaseName: goalportal
+    user: admin
+
+services:
+  # 1. Spring Boot Backend
+  - type: web
+    name: atomberg-backend
+    env: docker
+    rootDir: backend
+    dockerfilePath: Dockerfile
+    envVars:
+      - key: DB_HOST
+        fromDatabase:
+          name: atomberg-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: atomberg-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: atomberg-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: atomberg-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: atomberg-db
+          property: password
+      - key: JWT_SECRET
+        generateValue: true
+
+  # 2. React Vite Frontend
+  - type: web
+    name: atomberg-frontend
+    env: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    publishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: atomberg-backend
+          envVarKey: RENDER_EXTERNAL_URL
